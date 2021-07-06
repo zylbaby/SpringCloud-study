@@ -1,0 +1,46 @@
+spring:
+  profiles:
+    active: 7003
+---
+spring:
+  profiles: 7001
+  application:
+    name: Eureka-Server-01
+eureka:
+  client:
+    eureka-server-port: 7001
+    service-url:
+      defaultZone: http://127.0.0.1:7002/eureka
+  instance:
+    namespace: Eureka-01
+server:
+  port: 7001
+---
+  spring:
+    profiles: 7002
+    application:
+      name: Eureka-Server-02
+  eureka:
+    instance:
+      namespace: Eureka-02
+    client:
+      eureka-server-port: 7002
+      service-url:
+        defaultZone: http://127.0.0.1:7003/eureka
+  server:
+    port: 7002
+
+---
+    spring:
+      profiles: 7003
+      application:
+        name: Eureka-Server-03
+    eureka:
+      instance:
+        namespace: Eureka-03
+      client:
+        eureka-server-port: 7003
+        service-url:
+          defaultZone: http://127.0.0.1:7001/eureka
+    server:
+      port: 7003

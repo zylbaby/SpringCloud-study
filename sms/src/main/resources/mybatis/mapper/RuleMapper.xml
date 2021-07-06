@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.example.sms.mapper.RuleMapper">
+    
+    <!--<resultMap id="testMap" type="java.util.Map">-->
+        <!--<result column="resType" property="rType"></result>-->
+        <!--<result column="total" property="total"></result>-->
+        <!--<result column="free" property="free"></result>-->
+        <!--<result column="used" property="used"></result>-->
+        <!--<result column="rate" property="rate"></result>-->
+        <!--<collection property="ruleList"  resultMap="ruleMap" javaType="java.util.List" column="int_id">-->
+        <!--</collection>-->
+    <!--</resultMap>-->
+    <!--<resultMap id="ruleMap" type="java.util.Map" >-->
+        <!--<result column="alarmLevel" property="alarmLevel" javaType="String"/>-->
+        <!--<result column="upValue" property="upValue" javaType="String"/>-->
+        <!--<result column="downValue" property="downValue" javaType="String"/>-->
+    <!--</resultMap>-->
+
+    <resultMap id="testMap" type="java.util.Map">
+        <result column="name" property="name"></result>
+        <result column="resourceCode" property="resourceCode"></result>
+        <result column="allTotal" property="allTotal"></result>
+        <collection property="list"  resultMap="ruleMap" javaType="java.util.List" column="int_id">
+        </collection>
+    </resultMap>
+    <resultMap id="ruleMap" type="java.util.Map" >
+        <result column="customerName" property="customerName" javaType="String"/>
+        <result column="customerCode" property="customerCode" javaType="String"/>
+    </resultMap>
+
+    <select id="selectData" resultMap="testMap" resultType="java.util.Map">
+        select resourceTop55.name,resourceTop55.resourceCode,resourceTop55.allTotal,
+        top55.customerName,top55.customerCode
+        from
+        (select
+        resource_name as name,
+        resource_code as resourceCode,
+        all_total as allTotal
+        from t_idc_resource_top55 t1
+        where 1=1
+        and history = '0'
+        <if test="parentId != null and parentId != '' ">
+            AND t1.parent_id = #{parentId}
+        </if>
+        <if test="resourceType != null and resourceType != '' ">
+            AND t1.resource_type = #{resourceType}
+        </if>
+        ) resourceTop55
+        left join
+        (select tt1.customer_name as customerName,tt1.customer_code as customerCode,tt2.province_code  from t_customer_business_top55 tt1,
+        (
+        select distinct top55_name,province_code from  t_customer_ip t1 WHERE t1.is_top55='1'
+        <if test="provinceCode != null and provinceCode != '' ">
+            and province_code = #{provinceCode}
+        </if>
+        <if test="cityCode != null and cityCode != '' ">
+            and city_code = #{cityCode}
+        </if>
+        <if test="countyCode != null and countyCode != '' ">
+            and county_code = #{countyCode}
+        </if>
+        ) tt2
+        where tt2.top55_name = tt1.customer_name
+        ) top55
+        on top55.province_code = resourceTop55.resourceCode
+
+    </select>
+
+    
+</mapper>

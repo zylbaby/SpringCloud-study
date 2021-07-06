@@ -1,0 +1,98 @@
+# 应用名称
+spring:
+  application:
+    name: order-listener-feign
+  zipkin:
+    base-url: http://127.0.0.1:9411/
+  sleuth:
+    sampler:
+      rate: 1
+#  security:
+#    user:
+#      name: root
+#      password: root
+
+
+#feign配置
+feign:
+  client:
+    config:
+      sms-message:
+        logger-level: basic
+        connect-timeout: 3000
+        read-timeout: 3000
+  hystrix:
+    enabled: true
+#admin监控
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  endpoint:
+    health:
+      show-details: always
+      enabled: true
+#hystrix配置
+hystrix:
+  threadpool:
+    default:
+      coreSize: 20 #并发执行的最大线程数，默认10
+      maxQueueSize: 10 #BlockingQueue的最大队列数，默认值-1
+      queueSizeRejectionThreshold: 5 #即使maxQueueSize没有达到，达到queueSizeRejectionThreshold该值后，请求也会被拒绝，默认值5
+  command:
+    default:
+      execution:
+        timeout:
+          enabled: true
+        isolation:
+          thread:
+            timeoutInMilliseconds: 5000  #命令执行超时时间
+logging:
+  level:
+    com.example.orderlistenerfeign: debug
+
+#sms-message:
+#  ribbon:
+#    NFLoadBalancerRuleClassName: com.netflix.loadbalancer.RandomRule
+#开启ribbon的饥饿加载
+ribbon:
+  eager-load:
+    enabled: true
+    clients:
+    - sms-message
+
+---
+server:
+  port: 8083
+spring:
+  profiles: 8083
+eureka:
+  client:
+    service-url:
+      defaultZone: http://127.0.0.1:7001/eureka
+    registry-fetch-interval-seconds: 10
+  instance:
+    lease-expiration-duration-in-seconds: 3
+    #发送心跳给server的频率，每隔这个时间会主动心跳一次
+    lease-renewal-interval-in-seconds: 3
+    virtual-host-name: order-listener-feign
+    metadata-map:
+      version: v1
+---
+server:
+  port: 8084
+spring:
+  profiles: 8084
+eureka:
+  client:
+    service-url:
+      defaultZone: http://127.0.0.1:7001/eureka
+    registry-fetch-interval-seconds: 10
+  instance:
+    lease-expiration-duration-in-seconds: 3
+    #发送心跳给server的频率，每隔这个时间会主动心跳一次
+    lease-renewal-interval-in-seconds: 3
+    virtual-host-name: order-listener-feign
+    metadata-map:
+      version: v2

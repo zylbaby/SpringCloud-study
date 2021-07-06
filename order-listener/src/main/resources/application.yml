@@ -1,0 +1,24 @@
+# 应用名称
+spring:
+  application:
+    name: order-listener
+eureka:
+  client:
+    service-url:
+      defaultZone: http://127.0.0.1:7001/eureka
+  instance:
+    ip-address: 127.0.0.1
+    appname: order-listener
+    metadata-map:
+      version: v1
+
+---
+server:
+  port: 8012
+
+---
+#sms:
+server:
+  port: 8013
+  #  rabbion:
+#    NFLoadBalancerRuleClassName: com.netflix.loadbalancer.RandomRule

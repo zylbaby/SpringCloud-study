@@ -1,0 +1,60 @@
+server:
+  port: 6161
+
+# 应用名称
+spring:
+  application:
+    name: zuul-example
+  sleuth:
+    sampler:
+      rate: 1
+  zipkin:
+    base-url: http://127.0.0.1:9411/
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://127.0.0.1:7001/eureka
+      #同步注册表的时间
+    registry-fetch-interval-seconds: 10
+  instance:
+    lease-renewal-interval-in-seconds: 30
+    lease-expiration-duration-in-seconds: 30
+    instance-id: zuul-example
+    hostname: localhost
+  server:
+    enable-self-preservation: false
+    eviction-interval-timer-in-ms: 3000
+#日志
+logging:
+  level:
+    com.netflix: debug
+    org.springframework: DEBUG
+#不限流的URL
+exclude:
+  urls:
+    - /getPhone
+    - /getName
+
+hystrix:
+  command:
+    default:
+      execution:
+        timeout:
+          enabled: true
+        isolation:
+          thread:
+            timeoutInMilliseconds: 3000  #命令执行超时时间
+
+ribbon:
+  eager-load:
+    enabled: true
+    clients:
+      - sms-message
+      - order-listener-feign
+  ReadTimeout: 5000
+  ConnectTimeout: 5000    #指的是建立连接后从服务器读取到可用资源所用的时间。
+
+
+
+
